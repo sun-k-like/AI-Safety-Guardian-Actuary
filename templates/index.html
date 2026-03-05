@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AISG Mobile Monitor</title>
+</head>
+<body style="text-align:center; font-family: sans-serif; padding:20px;">
+    <h2>🚨 현장 안전 가디언</h2>
+    <input type="file" id="photo" accept="image/*" capture="camera" style="margin:20px 0;">
+    <button onclick="upload()" style="padding:10px 20px; background:#007bff; color:white; border:none; border-radius:5px;">분석 시작</button>
+    
+    <div id="result" style="margin-top:30px; display:none; border:1px solid #ddd; padding:15px;">
+        <h3 id="score" style="color:red;">점수: -</h3>
+        <p id="alert_text"></p>
+        <audio id="audio" controls></audio>
+    </div>
+
+    <script>
+        async function upload() {
+            const file = document.getElementById('photo').files[0];
+            const formData = new FormData();
+            formData.append('file', file);
+            
+            const res = await fetch('/analyze', { method: 'POST', body: formData });
+            const data = await res.json();
+            
+            document.getElementById('result').style.display = 'block';
+            document.getElementById('score').innerText = `위험 점수: ${data.risk_score}`;
+            document.getElementById('alert_text').innerText = data.briefing_ko;
+            document.getElementById('audio').src = '/static/alert.mp3?t=' + new Date().getTime();
+            document.getElementById('audio').play();
+        }
+    </script>
+</body>
+</html>
